@@ -1,0 +1,12 @@
+apiVersion: kustomize.config.k8s.io/v1beta1
+kind: Kustomization
+secretGenerator:
+ - name: mysql-pass
+   literals:
+      - password=mik1
+ - name: mysqluser-pass
+   literals:
+      - myuserpassword=mik2
+resources:
+   - deploy_database.yml
+   - deploy_owncloud.yml

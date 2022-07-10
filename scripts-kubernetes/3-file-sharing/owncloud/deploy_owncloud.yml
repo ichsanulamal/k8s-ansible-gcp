@@ -1,0 +1,91 @@
+apiVersion: v1
+kind: Service
+metadata:
+  name: owncloud
+  labels:
+    app: owncloud
+spec:
+  ports:
+  - port: 80
+    nodePort: 30039
+  selector:
+    app: owncloud
+    tier: frontend
+  type: LoadBalancer
+---
+apiVersion: v1
+kind: PersistentVolume
+metadata:
+  name: owncloud-pv
+  labels:
+    app: owncloud
+spec:
+  capacity:
+    storage: 1Gi
+  accessModes:
+    - ReadWriteOnce
+  hostPath:
+    path: "/mnt/data"
+---
+apiVersion: v1
+kind: PersistentVolumeClaim
+metadata:
+  name: owncloud-pvc
+  labels:
+    app: owncloud
+spec:
+  accessModes:
+  - ReadWriteOnce
+  resources:
+    requests:
+      storage: 1Gi
+---
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: owncloud
+  labels:
+    app: owncloud
+spec:
+  selector:
+    matchLabels:
+      app: owncloud
+      tier: frontend
+  strategy:
+    type: Recreate
+  template:
+    metadata:
+      labels:
+        app: owncloud
+        tier: frontend
+    spec:
+      nodeSelector:
+        group: file-sharing
+      containers:
+      - image: owncloud:latest
+        name: owncloud
+        env:
+        - name: MYSQL_ROOT_PASSWORD
+          valueFrom:
+            secretKeyRef:
+              name: mysql-pass
+              key: password
+        - name: MYSQL_USER
+          value: soumik
+        - name: MYSQL_PASSWORD
+          valueFrom:
+            secretKeyRef:
+              name: mysqluser-pass
+              key: myuserpassword
+        - name: MySQL_DATABASE
+          value: mysqldatabase
+        ports:
+        - containerPort: 80
+          name: owncloud
+        volumeMounts:
+        - name: owncloud-pv
+          mountPath: /var/www/html
+      volumes:
+      - name: owncloud-pv
+        persistentVolumeClaim:
+          claimName: owncloud-pvc

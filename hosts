@@ -1,0 +1,17 @@
+[control_plane]
+master ansible_host=35.238.53.116 ansible_user=amal
+
+[workers]
+wprofile1 ansible_host=34.134.82.65 ansible_user=amal
+wprofile2 ansible_host=34.71.140.190 ansible_user=amal
+wprofile3 ansible_host=35.184.94.150 ansible_user=amal
+
+monitoring ansible_host=34.133.17.245 ansible_user=amal 
+
+file-sharing ansible_host=34.68.171.10 ansible_user=amal 
+meeting-app ansible_host=35.226.126.159 ansible_user=amal
+
+db ansible_host=35.184.90.81 ansible_user=amal
+
+[all:vars]
+ansible_python_interpreter=/usr/bin/python3
